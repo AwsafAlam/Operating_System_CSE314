@@ -42,3 +42,33 @@ flag=0
         echo "$item 0" >> Marks.txt
     fi
 done
+
+if [ -d Output/ ]
+then 
+rm -r Output/ 
+fi
+
+mkdir Output
+cd Output
+
+if [ -d Extra/ ]
+then
+ rm -r Extra/ 
+fi
+
+mkdir Extra
+cd ..
+
+# for zip in `ls`
+# do
+#     echo $zip
+    
+# done
+
+find . -iname "*.zip" | while read zip
+do
+    # ... loop body
+    echo $f
+    # unzip -o $zip -d temp/
+    # rm $zip
+done
