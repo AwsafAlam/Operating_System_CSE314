@@ -1,7 +1,9 @@
 # man unzip
 chmod +x SubmissionsAll.zip
 unzip -o SubmissionsAll.zip
-cp -r SubmissionsAll.zip ../SubmissionsAll.zip  # Replace with mv at the end of assignment
+mv -f SubmissionsAll.zip ../SubmissionsAll.zip  # Replace with mv at the end of assignment
+
+makedir
 
 var=`ls`
 clear
@@ -43,21 +45,7 @@ flag=0
     fi
 done
 
-if [ -d Output/ ]
-then 
-rm -r Output/ 
-fi
 
-mkdir Output
-cd Output
-
-if [ -d Extra/ ]
-then
- rm -r Extra/ 
-fi
-
-mkdir Extra
-cd ..
 
 # for zip in `ls`
 # do
@@ -68,7 +56,28 @@ cd ..
 find . -iname "*.zip" | while read zip
 do
     # ... loop body
-    echo $f
-    # unzip -o $zip -d temp/
-    # rm $zip
+    # echo $zip
+    unzip -o "$zip" -d temp/
+    rm "$zip"
 done
+
+mv -f ../SubmissionsAll.zip SubmissionsAll.zip  # bringing back test input file :p 
+
+makedir()
+{
+    if [ -d Output/ ]
+    then 
+    rm -r Output/ 
+    fi
+
+    mkdir Output
+    cd Output
+
+    if [ -d Extra/ ]
+    then
+    rm -r Extra/ 
+    fi
+
+    mkdir Extra
+    cd ..
+}
