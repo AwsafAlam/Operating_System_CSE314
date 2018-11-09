@@ -48,7 +48,7 @@ flag=0
         if [ $item = $file ] 
         then
             flag=1
-            echo "$file 10" >> Marks.txt
+            # echo "$file 10" >> Marks.txt
             break
         fi
     done
@@ -78,20 +78,28 @@ do
         # cd temp
         mkdir "../Output/Extra/$s" 
         mv * "../Output/Extra/$s" 
+        echo "$s 0" >> ../Marks.txt
+
     else
 
         if [ "$s" = "$name" ]
         then
             cp -fr "$name" ../Output
             rm -fr "$name"
+            echo "$s 10" >> ../Marks.txt
         else
-            cp -fr "$name" ../Output/Extra/
-            rm -fr "$name"
+            mv "$name/" "$s/"   ##  This will also consider cases which does not contain std ID e.g Offline. (Such students should get 0)
+            # grep -P "\d{2}01\d{3}" $name
+            cp -fr "$s" ../Output/Extra/
+            rm -fr "$s"
+            echo "$s 5" >> ../Marks.txt
         fi
     fi
     cd ..
     rm "$zip"
 done
+
+rmdir temp
 
 # unzip -o "Aaiyeesha Mostak_2998885_assignsubmission_file_1405011.zip" -d temp/
 # cd temp
