@@ -116,6 +116,10 @@ rmdir temp
 # unzip -o "Aaiyeesha Mostak_2998885_assignsubmission_file_1405011.zip" -d temp/
 # cd temp
 # name=`ls`
+find . -iname "*.rar" | while read rar
+do
+    rm "$rar"
+done
 
 mv -f ../submissionsAll.zip submissionsAll.zip  # bringing back test input file :p 
 
