@@ -1,7 +1,11 @@
 # man unzip
-chmod +x SubmissionsAll.zip
-unzip -q -o SubmissionsAll.zip
-mv -f SubmissionsAll.zip ../SubmissionsAll.zip  # Replace with mv at the end of assignment
+chmod +x submissionsAll.zip
+unzip -q -o submissionsAll.zip
+mv -f submissionsAll.zip ../submissionsAll.zip  # Replace with mv at the end of assignment
+
+## If present before
+rm Absents.txt
+rm Marks.txt
 
 if [ -d Output/ ]
 then 
@@ -20,13 +24,9 @@ mkdir Extra
 cd ..
 
 
-var=`ls`
-clear
-echo "" > filelist.txt
-for variable in $var
-do
-    echo "$variable" >> filelist.txt
-done
+find . -iname "*.zip" > filelist.txt
+find . -iname "*.rar" >> filelist.txt
+
 # grep -wE "[0-9]*" filelist.txt
 # grep -w -E "0-9" CSE_322.csv
 # grep -P "\d{7}" CSE_322.csv > output.csv
@@ -42,7 +42,6 @@ Raster=`cut -c 3-9 CSE_322.csv`
 for item in $Raster
 do
 flag=0
-    # echo $item
     for file in $filelist 
     do
         if [ $item = $file ] 
@@ -63,7 +62,7 @@ done
 
 find . -iname "*.zip" | while read zip
 do
-    # echo $zip
+
     s=`echo "$zip" | cut -d "_" -f5 | cut -d "." -f1`
     unzip -q -o "$zip" -d temp/
     cd temp
@@ -72,10 +71,7 @@ do
     
     if [ $((count)) -gt 1 ]; then
         echo "Count: $count , $zip" ## Student submitted more than 2 files
-        ls
-        # cd ..
-        # mkdir "$s"
-        # cd temp
+        
         mkdir "../Output/Extra/$s" 
         mv * "../Output/Extra/$s" 
         echo "$s 0" >> ../Marks.txt
@@ -88,11 +84,27 @@ do
             rm -fr "$name"
             echo "$s 10" >> ../Marks.txt
         else
-            mv "$name/" "$s/"   ##  This will also consider cases which does not contain std ID e.g Offline. (Such students should get 0)
-            # grep -P "\d{2}01\d{3}" $name
-            cp -fr "$s" ../Output/Extra/
-            rm -fr "$s"
-            echo "$s 5" >> ../Marks.txt
+            regex="[0-9][0-9]05[0-1][0-9][0-9]"
+
+            if [[ "$name" =~ $regex ]]
+            then
+                # echo "matches";
+
+                mv "$name/" "$s/"
+                cp -fr "$s" ../Output
+                rm -fr "$s"
+                echo "$s 5" >> ../Marks.txt
+            else
+                # echo "doesn't match! $name";
+
+                mv "$name/" "$s/"
+                cp -fr "$s" ../Output/Extra/
+                rm -fr "$s"
+                echo "$s 0" >> ../Marks.txt
+                
+            fi
+
+            
         fi
     fi
     cd ..
@@ -105,6 +117,6 @@ rmdir temp
 # cd temp
 # name=`ls`
 
-mv -f ../SubmissionsAll.zip SubmissionsAll.zip  # bringing back test input file :p 
+mv -f ../submissionsAll.zip submissionsAll.zip  # bringing back test input file :p 
 
 # rm "*.rar"
