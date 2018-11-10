@@ -25,7 +25,7 @@ cd ..
 
 
 find . -iname "*.zip" > filelist.txt
-find . -iname "*.rar" >> filelist.txt
+# find . -iname "*.rar" >> filelist.txt
 
 # grep -wE "[0-9]*" filelist.txt
 # grep -w -E "0-9" CSE_322.csv
