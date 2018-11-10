@@ -85,7 +85,7 @@ do
             echo "$s 10" >> ../Marks.txt
         else
             regex="[0-9][0-9]05[0-1][0-9][0-9]"
-
+            echo "$name -> $s"
             if [[ "$name" =~ $regex ]]
             then
                 # echo "matches";
