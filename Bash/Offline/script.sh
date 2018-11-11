@@ -62,33 +62,60 @@ done
 function checkAbsenteeList()
 {
     echo "checking .."
+    if [ "$csvRoll" = "$name" ]
+    then
+        cp -fr "$name" ../Output
+        rm -fr "$name"
+        echo "$csvRoll 10" >> ../Marks.txt
+    else
+        # regex="[0-9][0-9]05[0-1][0-9][0-9]"
+        echo "$name -> $roll"
+        if [[ "$name" =~ $regex ]]
+        then
+            # echo "Dirname matches partially";
+
+            mv "$name/" "$csvRoll/"
+            cp -fr "$csvRoll" ../Output
+            rm -fr "$csvRoll"
+            echo "$csvRoll 5" >> ../Marks.txt
+        else
+            # echo "doesn't match! $name";
+            # dirname doesnt match roll (but correst roll in zip)
+            mv "$name/" "$csvRoll/"
+            cp -fr "$csvRoll" ../Output/Extra/
+            rm -fr "$csvRoll"
+            echo "$csvRoll 0" >> ../Marks.txt
+            
+        fi
+
+    fi
 }
 
 function populateMarksSheet()
 {
-    if [ "$s" = "$name" ]
+    if [ "$roll" = "$name" ]
     then
         cp -fr "$name" ../Output
         rm -fr "$name"
-        echo "$s 10" >> ../Marks.txt
+        echo "$roll 10" >> ../Marks.txt
     else
         # regex="[0-9][0-9]05[0-1][0-9][0-9]"
-        echo "$name -> $s"
+        echo "$name -> $roll"
         if [[ "$name" =~ $regex ]]
         then
-            # echo "matches";
+            # echo "Dirname matches partially";
 
-            mv "$name/" "$s/"
-            cp -fr "$s" ../Output
-            rm -fr "$s"
-            echo "$s 5" >> ../Marks.txt
+            mv "$name/" "$roll/"
+            cp -fr "$roll" ../Output
+            rm -fr "$roll"
+            echo "$roll 5" >> ../Marks.txt
         else
             # echo "doesn't match! $name";
-
-            mv "$name/" "$s/"
-            cp -fr "$s" ../Output/Extra/
-            rm -fr "$s"
-            echo "$s 0" >> ../Marks.txt
+            # dirname doesnt match roll (but correst roll in zip)
+            mv "$name/" "$roll/"
+            cp -fr "$roll" ../Output/Extra/
+            rm -fr "$roll"
+            echo "$roll 0" >> ../Marks.txt
             
         fi
 
@@ -99,29 +126,44 @@ function populateMarksSheet()
 find . -iname "*.zip" | while read zip
 do
 
-    s=`echo "$zip" | cut -d "_" -f5 | cut -d "." -f1`
+    roll=`echo "$zip" | cut -d "_" -f5 | cut -d "." -f1` # Getting roll from zip file name
+    stdName=`echo "$zip" | cut -d "_" -f1` 
     unzip -q -o "$zip" -d temp/
     cd temp
     name=`ls`
     count=`ls -1 | wc -l`
     
-    if [ $((count)) -gt 1 ]; then
-        echo "Count: $count , $zip" ## Student submitted more than 2 files
-        
-        mkdir "../Output/Extra/$s" 
-        mv * "../Output/Extra/$s" 
-        echo "$s 0" >> ../Marks.txt
+    regex="[0-9][0-9]05[0-1][0-9][0-9]"
+    if [[ "$roll" =~ $regex ]] ## Filename has correct roll
+    then
+    
+        if [ $((count)) -gt 1 ]; then
+            echo "Count: $count , $zip" ## Student submitted more than 2 files
+            
+            mkdir "../Output/Extra/$roll" 
+            mv * "../Output/Extra/$roll" 
+            echo "$roll 0" >> ../Marks.txt
 
-    else
-        regex="[0-9][0-9]05[0-1][0-9][0-9]"
-        if [[ "$s" =~ $regex ]]
-        then
-            # Zip
-            populateMarksSheet
         else
-            echo "roll in wrong format"
+            populateMarksSheet
+    
+        fi
+    else
+        echo "roll in wrong format"
+        csvRoll=`grep "$stdName" CSE_322 | cut -c 3-9`
+
+        if [ $((count)) -gt 1 ]; then
+            echo "Count: $count , $zip" ## Student submitted more than 2 files
+
+            mkdir "../Output/Extra/$csvRoll" 
+            mv * "../Output/Extra/$csvRoll" 
+            echo "$csvRoll 0" >> ../Marks.txt
+            sed -i "/$csvRoll/d" ../Absents.txt
+        else
+            checkAbsenteeList
         fi
     fi
+    
     cd ..
     rm "$zip"
 done
