@@ -59,6 +59,42 @@ flag=0
     fi
 done
 
+function checkAbsenteeList()
+{
+    echo "checking .."
+}
+
+function populateMarksSheet()
+{
+    if [ "$s" = "$name" ]
+    then
+        cp -fr "$name" ../Output
+        rm -fr "$name"
+        echo "$s 10" >> ../Marks.txt
+    else
+        # regex="[0-9][0-9]05[0-1][0-9][0-9]"
+        echo "$name -> $s"
+        if [[ "$name" =~ $regex ]]
+        then
+            # echo "matches";
+
+            mv "$name/" "$s/"
+            cp -fr "$s" ../Output
+            rm -fr "$s"
+            echo "$s 5" >> ../Marks.txt
+        else
+            # echo "doesn't match! $name";
+
+            mv "$name/" "$s/"
+            cp -fr "$s" ../Output/Extra/
+            rm -fr "$s"
+            echo "$s 0" >> ../Marks.txt
+            
+        fi
+
+    fi
+
+}
 
 find . -iname "*.zip" | while read zip
 do
@@ -77,34 +113,13 @@ do
         echo "$s 0" >> ../Marks.txt
 
     else
-
-        if [ "$s" = "$name" ]
+        regex="[0-9][0-9]05[0-1][0-9][0-9]"
+        if [[ "$s" =~ $regex ]]
         then
-            cp -fr "$name" ../Output
-            rm -fr "$name"
-            echo "$s 10" >> ../Marks.txt
+            # Zip
+            populateMarksSheet
         else
-            regex="[0-9][0-9]05[0-1][0-9][0-9]"
-            echo "$name -> $s"
-            if [[ "$name" =~ $regex ]]
-            then
-                # echo "matches";
-
-                mv "$name/" "$s/"
-                cp -fr "$s" ../Output
-                rm -fr "$s"
-                echo "$s 5" >> ../Marks.txt
-            else
-                # echo "doesn't match! $name";
-
-                mv "$name/" "$s/"
-                cp -fr "$s" ../Output/Extra/
-                rm -fr "$s"
-                echo "$s 0" >> ../Marks.txt
-                
-            fi
-
-            
+            echo "roll in wrong format"
         fi
     fi
     cd ..
@@ -113,14 +128,11 @@ done
 
 rmdir temp
 
-# unzip -o "Aaiyeesha Mostak_2998885_assignsubmission_file_1405011.zip" -d temp/
-# cd temp
-# name=`ls`
+# Removing all .rar files.
+## Assigning 0 marks inmarks list TODO
 find . -iname "*.rar" | while read rar
 do
     rm "$rar"
 done
 
 mv -f ../submissionsAll.zip submissionsAll.zip  # bringing back test input file :p 
-
-# rm "*.rar"
