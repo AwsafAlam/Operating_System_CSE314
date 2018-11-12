@@ -149,19 +149,38 @@ do
     
         fi
     else
-        echo "roll in wrong format"
-        csvRoll=`grep "$stdName" CSE_322 | cut -c 3-9`
+        echo "filename in wrong format"
+        csvRoll=`grep "$stdName" CSE_322.csv | cut -c 3-9`
+        lines=`grep "$stdName" CSE_322.csv | cut -c 3-9 | wc -l`
+        if [ $((lines)) -gt 1 ] 
+        then
+            ## More than 1 student with same name in csv
+            echo "$lines"
+            for $std in $csvRoll
+            do
+                echo $std
+                found=`grep "$std" ../Absents.txt | wc -l` #found in absentee list
 
-        if [ $((count)) -gt 1 ]; then
-            echo "Count: $count , $zip" ## Student submitted more than 2 files
+                ## if found = 1; student found. delete from absentee list, and rename folder
+            done
+            
 
-            mkdir "../Output/Extra/$csvRoll" 
-            mv * "../Output/Extra/$csvRoll" 
-            echo "$csvRoll 0" >> ../Marks.txt
-            sed -i "/$csvRoll/d" ../Absents.txt
         else
-            checkAbsenteeList
+            # Only one student with this name in csv
+            sed -i "/$csvRoll/d" ../Absents.txt # Deleting from absentees list
+
+            if [ $((count)) -gt 1 ]; then
+                echo "Count: $count , $zip" ## Student submitted more than 2 files
+
+                mkdir "../Output/Extra/$csvRoll" 
+                mv * "../Output/Extra/$csvRoll" 
+                echo "$csvRoll 0" >> ../Marks.txt
+                sed -i "/$csvRoll/d" ../Absents.txt
+            else
+                checkAbsenteeList
+            fi
         fi
+
     fi
     
     cd ..
