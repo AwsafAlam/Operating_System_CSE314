@@ -1,11 +1,15 @@
 # man unzip
-chmod +x submissionsAll.zip
-unzip -q -o submissionsAll.zip
-mv -f submissionsAll.zip ../submissionsAll.zip  # Replace with mv at the end of assignment
+chmod +x SubmissionsAll.zip
+unzip -q -o SubmissionsAll.zip
+mv -f SubmissionsAll.zip ../SubmissionsAll.zip  # Replace with mv at the end of assignment
 
 ## If present before
-rm Absents.txt
-rm Marks.txt
+if [ -f Absents.txt ]
+then 
+    rm Absents.txt
+    rm Marks.txt
+fi
+
 
 if [ -d Output/ ]
 then 
@@ -196,4 +200,4 @@ do
     rm "$rar"
 done
 
-mv -f ../submissionsAll.zip submissionsAll.zip  # bringing back test input file :p 
+mv -f ../SubmissionsAll.zip SubmissionsAll.zip  # bringing back test input file :p 
