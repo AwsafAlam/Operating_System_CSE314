@@ -31,15 +31,6 @@ cd ..
 find . -iname "*.zip" > filelist.txt
 # find . -iname "*.rar" >> filelist.txt
 
-# grep -wE "[0-9]*" filelist.txt
-# grep -w -E "0-9" CSE_322.csv
-# grep -P "\d{7}" CSE_322.csv > output.csv
-
-# cut -d"," -f1 CSE_322.csv | cut -d"\"" -f2
-# cut -d "\"" -f2 CSE_322.csv
-
-# cut -d "_" -f5 -s filelist.txt | cut -d "." -f1  ## Getting list of roll numbers from the extracted files
-
 filelist=`cut -d "_" -f5 -s filelist.txt | cut -d "." -f1`
 Raster=`cut -c 3-9 CSE_322.csv`
 
@@ -62,30 +53,30 @@ flag=0
         echo "$item 0" >> Marks.txt
     fi
 done
-
+# echo "------" >> Marks.txt
 function checkAbsenteeList()
 {
     echo "checking .."
-    if [ "$csvRoll" = "$name" ]
+    if [ "$csvRoll" = "$foldername" ]
     then
-        cp -fr "$name" ../Output
-        rm -fr "$name"
+        cp -fr "$foldername" ../Output
+        rm -fr "$foldername"
         echo "$csvRoll 10" >> ../Marks.txt
     else
         # regex="[0-9][0-9]05[0-1][0-9][0-9]"
-        echo "$name -> $roll"
-        if [[ "$name" =~ $regex ]]
+        echo "$foldername -> $roll"
+        if [[ "$foldername" =~ $regex ]]
         then
             # echo "Dirname matches partially";
 
-            mv "$name/" "$csvRoll/"
+            mv "$foldername/" "$csvRoll/"
             cp -fr "$csvRoll" ../Output
             rm -fr "$csvRoll"
             echo "$csvRoll 5" >> ../Marks.txt
         else
-            # echo "doesn't match! $name";
+            # echo "doesn't match! $foldername";
             # dirname doesnt match roll (but correst roll in zip)
-            mv "$name/" "$csvRoll/"
+            mv "$foldername/" "$csvRoll/"
             cp -fr "$csvRoll" ../Output/Extra/
             rm -fr "$csvRoll"
             echo "$csvRoll 0" >> ../Marks.txt
@@ -97,27 +88,27 @@ function checkAbsenteeList()
 
 function populateMarksSheet()
 {
-    if [ "$roll" = "$name" ]
+    if [ "$roll" = "$foldername" ]
     then
-        cp -fr "$name" ../Output
-        rm -fr "$name"
+        cp -fr "$foldername" ../Output
+        rm -fr "$foldername"
         echo "$roll 10" >> ../Marks.txt
     else
-        # regex="[0-9][0-9]05[0-1][0-9][0-9]"
-        echo "$name -> $roll"
-        if [[ "$name" =~ $regex ]]
+        regex="[0-9][0-9]05[0-1][0-9][0-9]"
+        echo "$foldername -> $roll"
+        if [[ "$foldername" =~ $regex ]]
         then
-            # echo "Dirname matches partially";
+            # echo "Dirname matches partially roll";
 
-            mv "$name/" "$roll/"
+            mv "$foldername/" "$roll/"
             cp -fr "$roll" ../Output
             rm -fr "$roll"
             echo "$roll 5" >> ../Marks.txt
         else
-            # echo "doesn't match! $name";
+            # echo "$foldername doesn't match roll";
             # dirname doesnt match roll (but correst roll in zip)
-            mv "$name/" "$roll/"
-            cp -fr "$roll" ../Output/Extra/
+            mv "$foldername/" "$roll/"
+            cp -fr "$roll" ../Output/
             rm -fr "$roll"
             echo "$roll 0" >> ../Marks.txt
             
@@ -130,19 +121,19 @@ function populateMarksSheet()
 find . -iname "*.zip" | while read zip
 do
 
-    roll=`echo "$zip" | cut -d "_" -f5 | cut -d "." -f1` # Getting roll from zip file name
-    stdName=`echo "$zip" | cut -d "_" -f1` 
+    roll=`echo "$zip" | cut -d "_" -f5 | cut -d "." -f1` # Getting roll from zip file foldername
+    stdName=`echo "$zip" | cut -d "_" -f1 | cut -c 3-`
     unzip -q -o "$zip" -d temp/
     cd temp
-    name=`ls`
-    count=`ls -1 | wc -l`
+    foldername=`ls` # foldername
+    count=`ls -1 | wc -l` # No. of folders after unzip
     
     regex="[0-9][0-9]05[0-1][0-9][0-9]"
-    if [[ "$roll" =~ $regex ]] ## Filename has correct roll
+    if [[ "$roll" =~ $regex ]] ## Filename has correct roll format
     then
     
         if [ $((count)) -gt 1 ]; then
-            echo "Count: $count , $zip" ## Student submitted more than 2 files
+            # echo "Count: $count , $zip" ## Student submitted more than 2 files
             
             mkdir "../Output/Extra/$roll" 
             mv * "../Output/Extra/$roll" 
@@ -150,34 +141,48 @@ do
 
         else
             populateMarksSheet
-    
         fi
     else
-        echo "filename in wrong format"
-        csvRoll=`grep "$stdName" CSE_322.csv | cut -c 3-9`
-        lines=`grep "$stdName" CSE_322.csv | cut -c 3-9 | wc -l`
+        echo "filename in wrong format for $stdName"
+        csvRoll=`grep "$stdName" ../CSE_322.csv | cut -c 3-9`
+        lines=`grep "$stdName" ../CSE_322.csv | cut -c 3-9 | wc -l`
         if [ $((lines)) -gt 1 ] 
         then
-            ## More than 1 student with same name in csv
-            echo "$lines"
-            for $std in $csvRoll
+            # More than 1 student with same name in csv
+            # echo "$lines , $csvRoll"
+            for std in $csvRoll
             do
-                echo $std
+                # echo "$std"
                 found=`grep "$std" ../Absents.txt | wc -l` #found in absentee list
-
+                echo "$found <-- Found; $std; $stdName>"
+                if [ $((found)) = 1 ] 
+                then
+                    # sed -i "/$std/d" ../Absents.txt # Deleting from absentees list
+                    mkdir "../Output/Extra/$stdName" 
+                    mv * "../Output/Extra/$stdName" 
+                    # echo "$std 0" >> ../Marks.txt
+                    break 
+                fi
+                
                 ## if found = 1; student found. delete from absentee list, and rename folder
             done
+        elif [ $((lines)) = 0 ]
+        then
+          ## No student with this name in CSV      
+            mkdir "../Output/Extra/$stdName" 
+            mv * "../Output/Extra/$stdName" 
+            # echo "$csvRoll 0" >> ../Marks.txt
+            # sed -i "/$csvRoll/d" ../Absents.txt
             
-
         else
-            # Only one student with this name in csv
+            # Only one student with this foldername in csv
             sed -i "/$csvRoll/d" ../Absents.txt # Deleting from absentees list
 
             if [ $((count)) -gt 1 ]; then
-                echo "Count: $count , $zip" ## Student submitted more than 2 files
+                echo "Count: $count , $zip , roll: $csvRoll" ## Student submitted more than 2 files
 
-                mkdir "../Output/Extra/$csvRoll" 
-                mv * "../Output/Extra/$csvRoll" 
+                mkdir "../Output/$csvRoll" 
+                mv * "../Output/$csvRoll" 
                 echo "$csvRoll 0" >> ../Marks.txt
                 sed -i "/$csvRoll/d" ../Absents.txt
             else
@@ -189,6 +194,7 @@ do
     
     cd ..
     rm "$zip"
+    echo "---------------"
 done
 
 rmdir temp
@@ -201,3 +207,17 @@ do
 done
 
 mv -f ../SubmissionsAll.zip SubmissionsAll.zip  # bringing back test input file :p 
+sort -n Marks.txt > Mark.txt
+rm Marks.txt
+
+sort -n Absents.txt > AbsenteeList.txt
+rm Absents.txt
+
+# grep -wE "[0-9]*" filelist.txt
+# grep -w -E "0-9" CSE_322.csv
+# grep -P "\d{7}" CSE_322.csv > output.csv
+
+# cut -d"," -f1 CSE_322.csv | cut -d"\"" -f2
+# cut -d "\"" -f2 CSE_322.csv
+
+# cut -d "_" -f5 -s filelist.txt | cut -d "." -f1  ## Getting list of roll numbers from the extracted files
