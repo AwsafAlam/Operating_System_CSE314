@@ -150,22 +150,40 @@ do
         then
             # More than 1 student with same name in csv
             # echo "$lines , $csvRoll"
-            for std in $csvRoll
-            do
-                # echo "$std"
-                found=`grep "$std" ../Absents.txt | wc -l` #found in absentee list
-                echo "$found <-- Found; $std; $stdName>"
-                if [ $((found)) = 1 ] 
-                then
-                    # sed -i "/$std/d" ../Absents.txt # Deleting from absentees list
-                    mkdir "../Output/Extra/$stdName" 
-                    mv * "../Output/Extra/$stdName" 
-                    # echo "$std 0" >> ../Marks.txt
-                    break 
-                fi
+            searchAbsente=`grep "$csvRoll" ../Absents.txt | wc -l`
+
+            if [ $((searchAbsente)) -gt 1 ] 
+            then
+                mkdir "../Output/Extra/$stdName" 
+                mv * "../Output/Extra/$stdName" 
+                    
+            elif [ $((searchAbsente)) = 0 ]
+            then       
+                echo "Not found in absentee list"
+            else
+                abs=`grep "$csvRoll" ../Absents.txt`
+                sed -i "/$abs/d" ../Absents.txt # Deleting from absentees list
+                mkdir "../Output/$csvRoll" 
+                mv * "../Output/$csvRoll" 
+                    
+            fi
+
+            # for std in $csvRoll
+            # do
+            #     # echo "$std"
+            #     found=`grep "$std" ../Absents.txt | wc -l` #found in absentee list
+            #     echo "$found <-- Found; $std; $stdName>"
+            #     if [ $((found)) = 1 ] 
+            #     then
+            #     ## if found = 1; student found. delete from absentee list, and rename folder
+            #         # sed -i "/$std/d" ../Absents.txt # Deleting from absentees list
+            #         mkdir "../Output/Extra/$stdName" 
+            #         mv * "../Output/Extra/$stdName" 
+            #         # echo "$std 0" >> ../Marks.txt
+            #         # break 
+            #     fi
                 
-                ## if found = 1; student found. delete from absentee list, and rename folder
-            done
+            # done
         elif [ $((lines)) = 0 ]
         then
           ## No student with this name in CSV      
