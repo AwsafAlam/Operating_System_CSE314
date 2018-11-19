@@ -1,4 +1,3 @@
-# man unzip
 chmod +x SubmissionsAll.zip
 unzip -q -o SubmissionsAll.zip
 mv -f SubmissionsAll.zip ../SubmissionsAll.zip  # Replace with mv at the end of assignment
@@ -13,16 +12,11 @@ fi
 
 if [ -d Output/ ]
 then 
-rm -fr Output/ 
+    rm -fr Output/ 
 fi
 
 mkdir Output
 cd Output
-
-if [ -d Extra/ ]
-then
-rm -fr Extra/ 
-fi
 
 mkdir Extra
 cd ..
@@ -47,16 +41,15 @@ flag=0
         fi
     done
 
-    if [ $flag = 0 ] 
+    if [ $flag = 0 ] ## item in CSV to present in folder
     then
         echo $item >> Absents.txt
         echo "$item 0" >> Marks.txt
     fi
 done
-# echo "------" >> Marks.txt
+
 function checkAbsenteeList()
 {
-    echo "checking .."
     if [ "$csvRoll" = "$foldername" ]
     then
         cp -fr "$foldername" ../Output
@@ -123,6 +116,7 @@ do
 
     roll=`echo "$zip" | cut -d "_" -f5 | cut -d "." -f1` # Getting roll from zip file foldername
     stdName=`echo "$zip" | cut -d "_" -f1 | cut -c 3-`
+    
     unzip -q -o "$zip" -d temp/
     cd temp
     foldername=`ls` # foldername
@@ -133,17 +127,18 @@ do
     then
     
         if [ $((count)) -gt 1 ]; then
-            # echo "Count: $count , $zip" ## Student submitted more than 2 files
+            # Student submitted more than 2 files
             
-            mkdir "../Output/Extra/$roll" 
-            mv * "../Output/Extra/$roll" 
-            echo "$roll 0" >> ../Marks.txt
+            mkdir "../Output/$roll" 
+            mv * "../Output/$roll" 
+            echo "$roll 0" >> ../Marks.txt #Gets 0 marks
 
         else
             populateMarksSheet
         fi
     else
         echo "filename in wrong format for $stdName"
+        
         csvRoll=`grep "$stdName" ../CSE_322.csv | cut -c 3-9`
         lines=`grep "$stdName" ../CSE_322.csv | cut -c 3-9 | wc -l`
         if [ $((lines)) -gt 1 ] 
@@ -153,7 +148,7 @@ do
             searchAbsente=`grep "$csvRoll" ../Absents.txt | wc -l`
 
             if [ $((searchAbsente)) -gt 1 ] 
-            then
+            then # We so not know which absentee is the actual person
                 mkdir "../Output/Extra/$stdName" 
                 mv * "../Output/Extra/$stdName" 
                     
@@ -218,11 +213,11 @@ done
 rmdir temp
 
 # Removing all .rar files.
-## Assigning 0 marks inmarks list TODO
-find . -iname "*.rar" | while read rar
-do
-    rm "$rar"
-done
+## Assigning 0 marks in marks list
+# find . -iname "*.rar" | while read rar
+# do
+#     rm "$rar"
+# done
 
 mv -f ../SubmissionsAll.zip SubmissionsAll.zip  # bringing back test input file :p 
 sort -n Marks.txt > Mark.txt
@@ -230,12 +225,3 @@ rm Marks.txt
 
 sort -n Absents.txt > AbsenteeList.txt
 rm Absents.txt
-
-# grep -wE "[0-9]*" filelist.txt
-# grep -w -E "0-9" CSE_322.csv
-# grep -P "\d{7}" CSE_322.csv > output.csv
-
-# cut -d"," -f1 CSE_322.csv | cut -d"\"" -f2
-# cut -d "\"" -f2 CSE_322.csv
-
-# cut -d "_" -f5 -s filelist.txt | cut -d "." -f1  ## Getting list of roll numbers from the extracted files
