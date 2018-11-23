@@ -2,6 +2,7 @@
 #include<pthread.h>
 #include<semaphore.h>
 #include<queue>
+#include <unistd.h>
 using namespace std;
 
 
@@ -28,7 +29,7 @@ void * ProducerFunc(void * arg)
 		sem_wait(&empty);
 
 		pthread_mutex_lock(&lock);		
-		sleep(1);	
+		//sleep(1);	
 		q.push(i);
 		printf("producer produced item %d\n",i);
 		

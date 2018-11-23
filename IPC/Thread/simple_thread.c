@@ -9,7 +9,7 @@ void * threadFunc1(void * arg)
 	for(i=1;i<=5;i++)
 	{
 		printf("%s\n",(char*)arg);
-		sleep(1);
+		sleep(2);
 	}
 }
 
