@@ -1,0 +1,26 @@
+./2017/Contest 198/probA.cpp
+./2017/Contest 200/B.cpp
+./2017/Contest 200/probB.cpp
+./2017/Contest 200/B1.cpp
+./Other years/prob A.cpp
+./Other years/Contest 196/D_1.cpp
+./Other years/Contest 196/submit B.cpp
+./Other years/Contest 196/D_fn.cpp
+./Other years/Contest 196/probD.cpp
+./Other years/Contest 196/probB.cpp
+./Other years/Contest 196/D_final.cpp
+./Other years/Contest 196/problem B.cpp
+./Other years/Contest 196/probA.cpp
+./Other years/probB.cpp
+./2018/February/Week 1/Contest 220/Showdown/A.cpp
+./2018/February/Week 1/Contest 220/Showdown/B.cpp
+./2018/February/Week 1/Contest 220/Showdown/Making Sequence Is Fun.cpp
+./2018/February/Week 1/Contest 220/Showdown/E.cpp
+./2018/February/Week 1/Contest 220/Showdown/C.cpp
+./2018/February/Week 1/Contest 220/Showdown/D.cpp
+./2018/February/Week 1/Contest 220/A.cpp
+./2018/February/Week 1/Contest 220/B.cpp
+./2018/February/Week 1/Contest 220/C.cpp
+./2018/January/Contest 244/A.cpp
+./2018/January/Contest 244/B.cpp
+./2018/January/C.cpp
