@@ -18,27 +18,27 @@ static void del_semvalue(void)
 		printf("Failed to delete semaphore\n");
 }
 
-static int semaphore_p(void)
+static int down(void)
 {
 	struct sembuf sem_b;
 	sem_b.sem_num = 0;
 	sem_b.sem_op = -1; /* P() */
 	sem_b.sem_flg = SEM_UNDO;
 	if (semop(sem_id, &sem_b, 1) == -1) {
-		printf("semaphore_p failed\n");
+		printf("down failed\n");
 		return(0);
 	}
 	return(1);
 }
 
-static int semaphore_v(void)
+static int up(void)
 {
 	struct sembuf sem_b;
 	sem_b.sem_num = 0;
 	sem_b.sem_op = 1; /* V() */
 	sem_b.sem_flg = SEM_UNDO;
 	if (semop(sem_id, &sem_b, 1) == -1) {
-		printf("semaphore_v failed\n");
+		printf("up failed\n");
 		return(0);
 	}
 	return(1);

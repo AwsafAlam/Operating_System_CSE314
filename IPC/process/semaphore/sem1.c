@@ -16,13 +16,13 @@ int main(int argc, char *argv[])
 		sleep(2);
 	}
 	for(i = 0; i < 5; i++) {
-		if (!semaphore_p()) exit(EXIT_FAILURE);
+		if (!down()) exit(EXIT_FAILURE);
 		printf("hello");
 		fflush(stdout);
 		sleep(4);
 		printf("world");
 		fflush(stdout);
-		if (!semaphore_v()) exit(EXIT_FAILURE);	
+		if (!up()) exit(EXIT_FAILURE);	
 	}
 	printf("\n%d - finished\n", getpid());
 	if (argc > 1) {

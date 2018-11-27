@@ -14,20 +14,24 @@ int main(int argc, char *argv[])
 			printf("Failed to initialize semaphore\n");
 			exit(EXIT_FAILURE);
 		}
-		sleep(2);
+		printf("\nParent initialised\n");
+		sleep(1);
 	}
 	for(i = 0; i < 5; i++) {
-		if (!semaphore_p()) exit(EXIT_FAILURE);
+		if (!down()) 
+			exit(EXIT_FAILURE);
 		printf("hello");
 		fflush(stdout);
-		sleep(4);
-		printf("world");
+		sleep(2);
+		printf("world\n");
 		fflush(stdout);
-		if (!semaphore_v()) exit(EXIT_FAILURE);		
+		if (!up()) 
+			exit(EXIT_FAILURE);		
 	}
 	printf("\n%d - finished\n", getpid());
 	if (pid != 0) {
-		sleep(6);
+		printf("Parent sleeping...");
+		sleep(2);
 		del_semvalue();
 	}
 	exit(EXIT_SUCCESS);

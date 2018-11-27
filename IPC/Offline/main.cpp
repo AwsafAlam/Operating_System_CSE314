@@ -32,8 +32,8 @@ void * ProducerFunc(void * arg)
 		sem_wait(&empty);
 
 		pthread_mutex_lock(&lock);		
-		//sleep(1);	
 		q.push(i);
+		sleep(2);	
 		printf("producer produced item %d\n",i);
 		
 		pthread_mutex_unlock(&lock);

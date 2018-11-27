@@ -25,11 +25,17 @@ int main()
 	printf("Memory attached at %p\n", shared_memory);
 	shared_stuff = (struct shared_use_st *)shared_memory;
 	while(running) {
-		while(shared_stuff->written_by_you == 1) {
+		// while(shared_stuff->written_by_you == 1) {
+		// 	sleep(1);
+		// 	printf("waiting for client...\n");
+		// }
+        if(shared_stuff->written_by_you) {
 			printf("You wrote: %s", shared_stuff->some_text);
-			sleep(1);
-			printf("waiting for...\n");
+			sleep(4); /* make the other process wait for us ! */
+			shared_stuff->written_by_you = 0;
+			
 		}
+
 		printf("Enter some text: ");
 		fgets(buffer, BUFSIZ, stdin);
 		strncpy(shared_stuff->some_text, buffer, TEXT_SZ);
