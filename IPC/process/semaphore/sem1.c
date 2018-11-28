@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 			printf("Failed to initialize semaphore\n");
 			exit(EXIT_FAILURE);
 		}
+		printf("\nSemaphore initialised\n");
 		sleep(2);
 	}
 	for(i = 0; i < 5; i++) {
@@ -20,12 +21,13 @@ int main(int argc, char *argv[])
 		printf("hello");
 		fflush(stdout);
 		sleep(4);
-		printf("world");
+		printf("world -critical\n");
 		fflush(stdout);
 		if (!up()) exit(EXIT_FAILURE);	
 	}
 	printf("\n%d - finished\n", getpid());
 	if (argc > 1) {
+		printf("Parent sleeping...");
 		sleep(6);
 		del_semvalue();
 	}

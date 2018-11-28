@@ -12,6 +12,12 @@ static int set_semvalue(void)
 	return(1);
 }
 
+static int set_semval_notmutex(int val)
+{
+	if (semctl(sem_id, 0, SETVAL, val) == -1) return(0);
+	return(1);
+}
+
 static void del_semvalue(void)
 {
 	if (semctl(sem_id, 0, IPC_RMID) == -1)

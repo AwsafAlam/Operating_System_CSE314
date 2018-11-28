@@ -14,16 +14,18 @@ int main(int argc, char *argv[])
 			printf("Failed to initialize semaphore\n");
 			exit(EXIT_FAILURE);
 		}
-		printf("\nParent initialised\n");
-		sleep(1);
+		printf("\nsemaphore initialised\n");
+		//sleep(1);
 	}
 	for(i = 0; i < 5; i++) {
 		if (!down()) 
 			exit(EXIT_FAILURE);
+		if(pid == 0){printf("Child it: %d\n",i);}
+		else {printf("Parent it: %d\n",i);}
 		printf("hello");
 		fflush(stdout);
-		sleep(2);
-		printf("world\n");
+		sleep(2); // To switch between parent child. otherwise, executes in one go.
+		printf("world -critical\n");
 		fflush(stdout);
 		if (!up()) 
 			exit(EXIT_FAILURE);		
