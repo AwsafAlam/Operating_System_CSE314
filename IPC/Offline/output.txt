@@ -1,75 +1,90 @@
 Chocolate producer started...
-Cake Decorator started...
-Chef X produced Chocolate cake 0
-Waiter 1 started..
-Waiter 2 started...
 Vanilla Producer started...
+Waiter 1 started..
 Chef X produced Chocolate cake 1
+Cake Decorator started...
+Waiter 2 started...
 Chef X produced Chocolate cake 2
 Chef X produced Chocolate cake 3
-Chef Y produced Vanilla cake 4
-Chocolate cake removed from Q1 ->Chef Z decorated cake 0
-Chocolate cake removed from Q1 ->Chef Z decorated cake 1
-Waiter 1->
-Waiter 1 served Cake: 0
+Chef X produced Chocolate cake 4
+Chef Y produced Vanilla cake 5
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 1
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 2
 Waiter 1->
 Waiter 1 served Cake: 1
-Chocolate cake removed from Q1 ->Chef Z decorated cake 2
-Chocolate cake removed from Q1 ->Chef Z decorated cake 3
-Vanilla cake removed from Q1 -> Chef Z decorated cake 4
 Waiter 1->
 Waiter 1 served Cake: 2
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 3
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 4
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 5
 Waiter 1->
 Waiter 1 served Cake: 3
-Chef X produced Chocolate cake 5
+Waiter 1->
+Waiter 1 served Cake: 4
 Chef X produced Chocolate cake 6
 Chef X produced Chocolate cake 7
 Chef X produced Chocolate cake 8
-Chocolate cake removed from Q1 ->Chef Z decorated cake 5
-Chocolate cake removed from Q1 ->Chef Z decorated cake 6
-Chocolate cake removed from Q1 ->Chef Z decorated cake 7
-Chocolate cake removed from Q1 ->Chef Z decorated cake 8
 Chef X produced Chocolate cake 9
-Chef X produced Chocolate cake 10
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 6
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 7
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 8
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 9
+Chef Y produced Vanilla cake 10
+Chef X produced Chocolate cake 11
+Chef X produced Chocolate cake 12
 Chocolate Producer Exited.
-Waiter 2->
-Waiter 2 Cake: 4
-Waiter 1->
-Waiter 1 served Cake: 5
 Waiter 1->
 Waiter 1 served Cake: 6
 Waiter 1->
 Waiter 1 served Cake: 7
 Waiter 1->
 Waiter 1 served Cake: 8
-Chef Y produced Vanilla cake 11
-Chef Y produced Vanilla cake 12
-Chef Y produced Vanilla cake 13
-Chocolate cake removed from Q1 ->Chef Z decorated cake 9
-Chocolate cake removed from Q1 ->Chef Z decorated cake 10
-Vanilla cake removed from Q1 -> Chef Z decorated cake 11
-Vanilla cake removed from Q1 -> Chef Z decorated cake 12
-Vanilla cake removed from Q1 -> Chef Z decorated cake 13
-Waiter 2->
-Waiter 2 Cake: 11
-Waiter 2->
-Waiter 2 Cake: 12
-Waiter 2->
-Waiter 2 Cake: 13
-Chef Y produced Vanilla cake 14
 Waiter 1->
 Waiter 1 served Cake: 9
-Waiter 1->
-Waiter 1 served Cake: 10
-Waiter 1 exited
-Vanilla cake removed from Q1 -> Chef Z decorated cake 14
+Chef Y produced Vanilla cake 13
+Chef Y produced Vanilla cake 14
+Waiter 2->
+Waiter 2 Cake: 5
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 10
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 11
+Chocolate cake moved from Q1 -> Q3 :Chef Z decorated cake 12
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 13
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 14
+Waiter 2->
+Waiter 2 Cake: 10
+Waiter 2->
+Waiter 2 Cake: 13
+Waiter 2->
+Waiter 2 Cake: 14
 Chef Y produced Vanilla cake 15
 Chef Y produced Vanilla cake 16
 Chef Y produced Vanilla cake 17
 Chef Y produced Vanilla cake 18
 Chef Y produced Vanilla cake 19
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 15
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 16
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 17
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 18
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 19
+Waiter 2->
+Waiter 2 Cake: 15
+Waiter 2->
+Waiter 2 Cake: 16
+Waiter 2->
+Waiter 2 Cake: 17
+Waiter 2->
+Waiter 2 Cake: 18
+Waiter 2->
+Waiter 2 Cake: 19
+Waiter 1->
+Waiter 1 served Cake: 11
+Waiter 1->
+Waiter 1 served Cake: 12
+Waiter 1 exited
+Chef Y produced Vanilla cake 20
 Vanilla Producer Exited.
-Vanilla cake removed from Q1 -> Chef Z decorated cake 15
-Vanilla cake removed from Q1 -> Chef Z decorated cake 16
-Vanilla cake removed from Q1 -> Chef Z decorated cake 17
-Vanilla cake removed from Q1 -> Chef Z decorated cake 18
+Vanilla cake moved from Q1 -> Q3 :Chef Z decorated cake 20
+Decorator Exited
+Waiter 2->
+Waiter 2 Cake: 20
+Waiter 2 exited

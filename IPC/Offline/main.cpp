@@ -11,6 +11,7 @@
 #define CHOCOLATE 1
 #define VANILLA 0
 #define QUEUE_SIZE 5
+#define CAKE_NO 10
 using namespace std;
 
 
@@ -27,7 +28,7 @@ sem_t q2full;
 queue<Cake *> q1;
 queue<Cake *> q2;
 queue<Cake *> q3;
-int i = 0;
+int i = 1; //Cake id
 
 pthread_mutex_t lock;
 
@@ -50,8 +51,7 @@ void * ChocolateProd(void * arg)
 {	
 	printf("%s\n",(char*)arg);
 	
-	// while(q1.size() < QUEUE_SIZE)
-	for(int j = 0 ; j< 10 ; j++)
+	for(int j = 0 ; j< CAKE_NO ; j++)
 	{
 		sem_wait(&empty);
 		pthread_mutex_lock(&lock);		
@@ -73,8 +73,7 @@ void * VanillaProd(void * arg)
 {	
 	printf("%s\n",(char*)arg);
 
-	// while(q1.size() < QUEUE_SIZE)
-	for(int j =0 ; j< 10 ; j++)
+	for(int j =0 ; j< CAKE_NO ; j++)
 	{
 		sem_wait(&empty);
 		pthread_mutex_lock(&lock);		
@@ -98,7 +97,7 @@ void * Decorator(void * arg)
 	printf("%s\n",(char*)arg);
 	
 	// while(!q1.empty())
-	for(int j = 0 ; j< 20 ; j++)
+	for(int j = 0 ; j< 2*CAKE_NO ; j++)
 	{
 
 		sem_wait(&full);
@@ -110,7 +109,7 @@ void * Decorator(void * arg)
 		
 			q1.pop();
 			q3.push(item);
-			printf("Chocolate cake removed from Q1 ->");
+			printf("Chocolate cake moved from Q1 -> Q3 :");
 	
 			sem_post(&q3full);
 		}
@@ -119,7 +118,7 @@ void * Decorator(void * arg)
 			sem_wait(&q2empty);
 			q1.pop();
 			q2.push(item);
-			printf("Vanilla cake removed from Q1 -> ");
+			printf("Vanilla cake moved from Q1 -> Q2 :");
 
 			sem_post(&q2full);
 		}
@@ -139,13 +138,12 @@ void * Waiter_1_Consume(void * arg)
 	printf("%s\n",(char*)arg);
 
 	// while(!q3.empty())
-	for(int j =0 ; j< 10 ; j++)
+	for(int j =0 ; j< CAKE_NO ; j++)
 	{	
- 		
-		sem_wait(&q3full);
+ 		sem_wait(&q3full);
 		pthread_mutex_lock(&lock);
 
- 		printf("Waiter 1->\n");
+ 		printf("Waiter 1 serving->\n");
 			
 		Cake * item = q3.front();
 		q3.pop();
@@ -162,12 +160,12 @@ void * Waiter_2_Consume(void * arg)
 {
 	printf("%s\n",(char*)arg);
 	// while(!q2.empty())
-	for(int j =0 ; j< 10 ; j++)
+	for(int j =0 ; j< CAKE_NO ; j++)
 	{	
 		sem_wait(&q2full);
 		pthread_mutex_lock(&lock);
 
- 		printf("Waiter 2->\n");
+ 		printf("Waiter 2 serving->\n");
 			
 		Cake * item = q2.front();
 		q2.pop();
@@ -198,9 +196,9 @@ int main(void)
 	init_semaphore();
 	
 	
-	pthread_create(&chefx,NULL,ChocolateProd,(void*)"Chocolate producer started..." );
-	pthread_create(&chefy,NULL,VanillaProd,(void*)"Vanilla Producer started..." );
-	pthread_create(&chefz,NULL,Decorator,(void*)"Cake Decorator started..." );
+	pthread_create(&chefx,NULL,ChocolateProd,(void*)"ChefX started..." );
+	pthread_create(&chefy,NULL,VanillaProd,(void*)"ChefY started..." );
+	pthread_create(&chefz,NULL,Decorator,(void*)"ChefZ started..." );
 
 	pthread_create(&chefy,NULL,Waiter_1_Consume,(void*)"Waiter 1 started.." );
 	pthread_create(&chefz,NULL,Waiter_2_Consume,(void*)"Waiter 2 started..." );
