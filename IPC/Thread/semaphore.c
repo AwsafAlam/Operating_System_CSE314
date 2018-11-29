@@ -1,5 +1,7 @@
 #include<stdio.h>
 #include<pthread.h>
+#include <unistd.h>
+
 #include<semaphore.h>
 
 sem_t bin_sem;
@@ -30,6 +32,7 @@ int main(void)
 {
 	pthread_t athread;
 	pthread_attr_t ta;
+	
 	char message2[10];
 	int x;
 	sem_init(&bin_sem,0,1);

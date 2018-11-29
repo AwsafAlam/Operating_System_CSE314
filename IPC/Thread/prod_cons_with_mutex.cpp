@@ -3,6 +3,7 @@
 #include<semaphore.h>
 #include<queue>
 #include <unistd.h>
+#include <iostream>
 
 using namespace std;
 
