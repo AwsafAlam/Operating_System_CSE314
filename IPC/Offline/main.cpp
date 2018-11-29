@@ -50,8 +50,8 @@ void * ChocolateProd(void * arg)
 {	
 	printf("%s\n",(char*)arg);
 	
-	while(q1.size() < QUEUE_SIZE)
-	// for(int j = 0 ; j< 10 ; j++)
+	// while(q1.size() < QUEUE_SIZE)
+	for(int j = 0 ; j< 10 ; j++)
 	{
 		sem_wait(&empty);
 		pthread_mutex_lock(&lock);		
@@ -60,10 +60,12 @@ void * ChocolateProd(void * arg)
 		printf("Chef X produced Chocolate cake %d\n",i);
 		i++;	
 		sleep(1);	
-		
+
 		pthread_mutex_unlock(&lock);
 		sem_post(&full);
+
 	}
+	printf("Chocolate Producer Exited.\n");
 }
 
 
@@ -71,39 +73,44 @@ void * VanillaProd(void * arg)
 {	
 	printf("%s\n",(char*)arg);
 
-	while(q1.size() < QUEUE_SIZE)
-	// for(int j =0 ; j < 10 ; j++)
+	// while(q1.size() < QUEUE_SIZE)
+	for(int j =0 ; j< 10 ; j++)
 	{
 		sem_wait(&empty);
-
 		pthread_mutex_lock(&lock);		
+
 		q1.push(new Cake(i ,VANILLA));
 		printf("Chef Y produced Vanilla cake %d\n",i);
 		i++;		
 		sleep(1);	
+
 		pthread_mutex_unlock(&lock);
-	
 		sem_post(&full);
+	
 	}
+	printf("Vanilla Producer Exited.\n");
+
 }
 
 
 void * Decorator(void * arg)
 {	
 	printf("%s\n",(char*)arg);
-	int i;
-	while(!q1.empty())
+	
+	// while(!q1.empty())
+	for(int j = 0 ; j< 20 ; j++)
 	{
-		sem_wait(&full);
 
+		sem_wait(&full);
 		pthread_mutex_lock(&lock);		
 
 		Cake * item = q1.front();
 		if(item->getType() == CHOCOLATE){
 			sem_wait(&q3empty);
+		
 			q1.pop();
 			q3.push(item);
-			printf("Chocolate cake removed from Q1");
+			printf("Chocolate cake removed from Q1 ->");
 	
 			sem_post(&q3full);
 		}
@@ -112,30 +119,33 @@ void * Decorator(void * arg)
 			sem_wait(&q2empty);
 			q1.pop();
 			q2.push(item);
-			printf("Vanilla cake removed from Q1");
+			printf("Vanilla cake removed from Q1 -> ");
 
 			sem_post(&q2full);
 		}
 		printf("Chef Z decorated cake %d\n",item->getID());
 		sleep(1);	
-		
+
 		pthread_mutex_unlock(&lock);
-	
 		sem_post(&empty);
+	
+
 	}
+	printf("Decorator Exited\n");
 }
 
 void * Waiter_1_Consume(void * arg)
 {
 	printf("%s\n",(char*)arg);
-	
 
 	// while(!q3.empty())
-	for(int j =0 ; j< QUEUE_SIZE ; j++)
+	for(int j =0 ; j< 10 ; j++)
 	{	
-		sem_wait(&q3full);
  		
+		sem_wait(&q3full);
 		pthread_mutex_lock(&lock);
+
+ 		printf("Waiter 1->\n");
 			
 		Cake * item = q3.front();
 		q3.pop();
@@ -143,7 +153,6 @@ void * Waiter_1_Consume(void * arg)
 		sleep(1);
 
 		pthread_mutex_unlock(&lock);
-		
 		sem_post(&q3empty);
 	}
 	printf("Waiter 1 exited\n");
@@ -153,20 +162,21 @@ void * Waiter_2_Consume(void * arg)
 {
 	printf("%s\n",(char*)arg);
 	// while(!q2.empty())
-	for(int j =0 ; j< QUEUE_SIZE ; j++)
+	for(int j =0 ; j< 10 ; j++)
 	{	
 		sem_wait(&q2full);
- 		
 		pthread_mutex_lock(&lock);
+
+ 		printf("Waiter 2->\n");
 			
 		Cake * item = q2.front();
 		q2.pop();
-		printf("Waiter 2 served Cake: %d\n",item->getID());	
+		printf("Waiter 2 Cake: %d\n",item->getID());	
 		sleep(1);
 
 		pthread_mutex_unlock(&lock);
-		
 		sem_post(&q2empty);
+		
 	}
 	printf("Waiter 2 exited\n");
 
@@ -196,5 +206,6 @@ int main(void)
 	pthread_create(&chefz,NULL,Waiter_2_Consume,(void*)"Waiter 2 started..." );
 	
 	while(1);
+	// pthread_exit(NULL);
 	return 0;
 }
