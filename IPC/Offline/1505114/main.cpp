@@ -11,7 +11,7 @@
 #define CHOCOLATE 1
 #define VANILLA 0
 #define QUEUE_SIZE 5
-#define CAKE_NO 5
+#define CAKE_NO 10
 using namespace std;
 
 
@@ -28,13 +28,9 @@ sem_t q2full;
 queue<Cake *> q1;
 queue<Cake *> q2;
 queue<Cake *> q3;
-
 int i = 1; //Cake id
 
 pthread_mutex_t lock;
-pthread_mutex_t q2lock;
-pthread_mutex_t q3lock;
-pthread_mutex_t prntlock;
 
 
 void init_semaphore()
@@ -49,18 +45,11 @@ void init_semaphore()
 	sem_init(&q3full,0,0);
 	
 	pthread_mutex_init(&lock,0);
-	pthread_mutex_init(&q2lock,0);
-	pthread_mutex_init(&q3lock,0);
-	pthread_mutex_init(&prntlock,0);
-
 }
 
 void * ChocolateProd(void * arg)
 {	
-
-	pthread_mutex_lock(&prntlock);		
-		printf("%s\n",(char*)arg);
-	pthread_mutex_unlock(&prntlock);		
+	printf("%s\n",(char*)arg);
 	
 	for(int j = 0 ; j< CAKE_NO ; j++)
 	{
@@ -68,11 +57,7 @@ void * ChocolateProd(void * arg)
 		pthread_mutex_lock(&lock);		
 		
 		q1.push(new Cake(i ,CHOCOLATE ));
-		
-		pthread_mutex_lock(&prntlock);		
 		printf("Chef X produced Chocolate cake %d\n",i);
-		pthread_mutex_unlock(&prntlock);		
-		
 		i++;	
 		sleep(1);	
 
@@ -80,17 +65,13 @@ void * ChocolateProd(void * arg)
 		sem_post(&full);
 
 	}
-	pthread_mutex_lock(&prntlock);		
-		printf("Chocolate Producer Exited.\n");
-	pthread_mutex_unlock(&prntlock);		
+	printf("Chocolate Producer Exited.\n");
 }
 
 
 void * VanillaProd(void * arg)
 {	
-	pthread_mutex_lock(&prntlock);		
 	printf("%s\n",(char*)arg);
-	pthread_mutex_unlock(&prntlock);		
 
 	for(int j =0 ; j< CAKE_NO ; j++)
 	{
@@ -98,11 +79,7 @@ void * VanillaProd(void * arg)
 		pthread_mutex_lock(&lock);		
 
 		q1.push(new Cake(i ,VANILLA));
-	
-		pthread_mutex_lock(&prntlock);		
 		printf("Chef Y produced Vanilla cake %d\n",i);
-		pthread_mutex_unlock(&prntlock);		
-		
 		i++;		
 		sleep(1);	
 
@@ -110,19 +87,16 @@ void * VanillaProd(void * arg)
 		sem_post(&full);
 	
 	}
-	pthread_mutex_lock(&prntlock);		
 	printf("Vanilla Producer Exited.\n");
-	pthread_mutex_unlock(&prntlock);		
 
 }
 
 
 void * Decorator(void * arg)
 {	
-	pthread_mutex_lock(&prntlock);		
 	printf("%s\n",(char*)arg);
-	pthread_mutex_unlock(&prntlock);		
 	
+	// while(!q1.empty())
 	for(int j = 0 ; j< 2*CAKE_NO ; j++)
 	{
 
@@ -130,48 +104,29 @@ void * Decorator(void * arg)
 		pthread_mutex_lock(&lock);		
 
 		Cake * item = q1.front();
-		q1.pop();
-
-		pthread_mutex_unlock(&lock);
-
-		sem_post(&empty);
-
 		if(item->getType() == CHOCOLATE){
 			sem_wait(&q3empty);
-			pthread_mutex_lock(&q3lock);		
-	
-			// q1.pop();
+		
+			q1.pop();
 			q3.push(item);
-
-			pthread_mutex_lock(&prntlock);		
 			printf("Chocolate cake moved from Q1 -> Q3 :");
-			pthread_mutex_unlock(&prntlock);		
-	
-			pthread_mutex_unlock(&q3lock);		
 	
 			sem_post(&q3full);
 		}
 		else if (item->getType() == VANILLA)
 		{
 			sem_wait(&q2empty);
-			pthread_mutex_lock(&q2lock);		
-			// q1.pop();
+			q1.pop();
 			q2.push(item);
-	
-			pthread_mutex_lock(&prntlock);		
 			printf("Vanilla cake moved from Q1 -> Q2 :");
-			pthread_mutex_unlock(&prntlock);		
-		
-			pthread_mutex_unlock(&q2lock);		
+
 			sem_post(&q2full);
 		}
-		pthread_mutex_lock(&prntlock);		
 		printf("Chef Z decorated cake %d\n",item->getID());
-		pthread_mutex_unlock(&prntlock);		
 		sleep(1);	
 
-		// pthread_mutex_unlock(&lock);
-		// sem_post(&empty);
+		pthread_mutex_unlock(&lock);
+		sem_post(&empty);
 	
 
 	}
@@ -180,65 +135,48 @@ void * Decorator(void * arg)
 
 void * Waiter_1_Consume(void * arg)
 {
-	pthread_mutex_lock(&prntlock);		
-		printf("%s\n",(char*)arg);
-	pthread_mutex_unlock(&prntlock);		
+	printf("%s\n",(char*)arg);
 
 	// while(!q3.empty())
 	for(int j =0 ; j< CAKE_NO ; j++)
 	{	
  		sem_wait(&q3full);
-		pthread_mutex_lock(&q3lock);
+		pthread_mutex_lock(&lock);
 
- 		// printf("Waiter 1 serving->\n");
+ 		printf("Waiter 1 serving->\n");
 			
 		Cake * item = q3.front();
 		q3.pop();
-
-		pthread_mutex_lock(&prntlock);		
 		printf("Waiter 1 served Cake: %d\n",item->getID());	
-		pthread_mutex_unlock(&prntlock);		
-
 		sleep(1);
 
-		pthread_mutex_unlock(&q3lock);
+		pthread_mutex_unlock(&lock);
 		sem_post(&q3empty);
 	}
-	pthread_mutex_lock(&prntlock);		
-		printf("Waiter 1 exited\n");
-	pthread_mutex_unlock(&prntlock);		
+	printf("Waiter 1 exited\n");
 }
 
 void * Waiter_2_Consume(void * arg)
 {
-	pthread_mutex_lock(&prntlock);		
-		printf("%s\n",(char*)arg);
-	pthread_mutex_unlock(&prntlock);		
-	
+	printf("%s\n",(char*)arg);
+	// while(!q2.empty())
 	for(int j =0 ; j< CAKE_NO ; j++)
 	{	
 		sem_wait(&q2full);
-		pthread_mutex_lock(&q2lock);
+		pthread_mutex_lock(&lock);
 
- 		// printf("Waiter 2 serving->\n");
+ 		printf("Waiter 2 serving->\n");
 			
 		Cake * item = q2.front();
 		q2.pop();
-
-		pthread_mutex_lock(&prntlock);		
-		printf("Waiter 2 served Cake: %d\n",item->getID());	
-		pthread_mutex_unlock(&prntlock);		
-
+		printf("Waiter 2 Cake: %d\n",item->getID());	
 		sleep(1);
 
-		pthread_mutex_unlock(&q2lock);
+		pthread_mutex_unlock(&lock);
 		sem_post(&q2empty);
 		
 	}
-
-	pthread_mutex_lock(&prntlock);		
 	printf("Waiter 2 exited\n");
-	pthread_mutex_unlock(&prntlock);		
 
 }
 

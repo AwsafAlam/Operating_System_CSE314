@@ -13,6 +13,8 @@ sem_t empty;
 sem_t full;
 queue<int> q;
 pthread_mutex_t lock;
+pthread_mutex_t q2lock;
+pthread_mutex_t q3lock;
 
 
 void init_semaphore()
@@ -20,6 +22,9 @@ void init_semaphore()
 	sem_init(&empty,0,5);
 	sem_init(&full,0,0);
 	pthread_mutex_init(&lock,0);
+	pthread_mutex_init(&q2lock,0);
+	pthread_mutex_init(&q3lock,0);
+
 }
 
 void * ProducerFunc(void * arg)
