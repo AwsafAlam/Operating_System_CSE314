@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.tcl": "tcl",
+        "types.h": "c",
+        "proc.h": "c",
+        "stat.h": "c",
+        "user.h": "c",
+        "fcntl.h": "c"
+    }
+}
