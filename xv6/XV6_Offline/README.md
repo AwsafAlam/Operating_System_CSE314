@@ -1,3 +1,13 @@
+# Offline 1 Adding new SYsytem call
+
+1. Create a new system call in xv6 with the following specifications:
+
+  a. Name of the system call will be your firstname_lastname
+  b. The system call will print your name and date of birth
+  c. The system call will return your student id
+2. Create a user program in xv6 that will call your newly added system call
+3. From xv6 shell, run the user program
+
 # syscall.h
  #define awsaf_alam 32
 
@@ -56,6 +66,7 @@ modify the makefile
 
 - add _roll to UPROGS
 - add roll.c to EXTRA
-
-
-
+  
+make
+sudo apt-get install qemu
+make qemu
