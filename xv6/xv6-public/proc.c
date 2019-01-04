@@ -536,6 +536,6 @@ procdump(void)
 int
 awsaf_alam(void)
 {
-  // printf(1, "1505114\n");
+  cprintf("Md Awsaf Alam, born in 12-12-1996\n");
   return 1505114;
 }
