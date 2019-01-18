@@ -27,7 +27,25 @@ sinit(void)
   // initialization.
   //
   initlock(&stable.lock, "stable");
-  s = stable.sock;
+  //s = stable.sock;
+}
+
+// Allocate a file structure.
+struct sock*
+sockalloc(void)
+{
+  struct sock *f;
+
+  acquire(&stable.lock);
+  for(f = stable.sock; f < stable.sock+ NSOCK; f++){
+//    if(f->ref == 0){
+//      f->ref = 1;
+//      release(&ftable.lock);
+//      return f;
+//    }
+  }
+  release(&stable.lock);
+  return 0;
 }
 
 int
@@ -47,10 +65,11 @@ listen(int lport) {
   /// unlock
   acquire(&stable.lock);
   cprintf("Listening at \n",lport);
-    
+
   // s = stable.sock;
   s->localport = lport;
-  s->state = LISTEN;
+  s->state = LISTENING;
+  s->remoteport = NSOCK/2;
   //sock.localport = lport;
   //sock.st.LISTEN;
   release(&stable.lock);
@@ -70,7 +89,7 @@ connect(int rport, const char* host) {
   cprintf("Connecting\n");
   // s= stable.sock;
   s->remoteport = rport;
-  s->state = CONNECT;
+  s->state = CONNECTED;
   release(&stable.lock);
   return s->localport;
 
@@ -92,7 +111,7 @@ send(int lport, const char* data, int n) {
   }
   s->dataPresent = 1;
   release(&stable.lock);
-  
+
   return 0;
 }
 

@@ -2,7 +2,7 @@
 //
 // TODO: Define an enumeration to represent socket state.
 //
-enum socstate { CLOSED, LISTEN, CONNECT };
+enum socstate { CLOSED, LISTENING, CONNECTED };
 //
 // TODO: Define a structure to represent a socket.
 //
@@ -15,5 +15,5 @@ struct sock {
   char buf[128];
   int dataPresent;
 
-  enum socstate state;        // Process state
+  enum socstate state;        // Socket state
 };
