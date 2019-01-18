@@ -13,7 +13,7 @@ void clientProc() {
 
   printf(1, "Client>> Attempting to connect to port %d, host %s ...\n", serverPort, host);
   clientPort = connect(serverPort, host);
-  sleep(20);
+  //sleep(20); // For context switching
   printf(1, "Client>> connect() returned %d\n", clientPort);
 
   while (1) {
@@ -21,6 +21,7 @@ void clientProc() {
     gets(buf, sizeof(buf));
     buf[strlen(buf) - 1] = '\0'; // Eliminating the '\n'
     send(clientPort, buf, strlen(buf) + 1);
+    //buf[0] = '\0';
 
     if (0 == strcmp(buf, "exit")) {
       printf(1, "Client exiting...\n");
@@ -59,6 +60,13 @@ void serverProc() {
 
     strcpy(buf+strlen(buf), " OK");
     send(serverPort, buf, strlen(buf) + 1);
+    
+    // printf(1, "Server>> Enter text to send to client: ");
+    // gets(buf, sizeof(buf));
+    // buf[strlen(buf) - 1] = '\0'; // Eliminating the '\n'
+    // send(serverPort, buf, strlen(buf) + 1);
+    //Clear buffer after send
+    //buf[0] = '\0';
   }
 }
 

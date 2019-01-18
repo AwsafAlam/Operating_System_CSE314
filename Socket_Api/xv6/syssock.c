@@ -28,7 +28,8 @@ sys_connect(void)
   // TODO: Write your code to get and validate port no., host.
   // Allow connection to "localhost" or "127.0.0.1" host only
   //
-
+   argint(0 , &port);
+   argstr(1,&host);
   return connect(port, host);
 }
 
@@ -42,7 +43,9 @@ sys_send(void)
   //
   // TODO: Write your code to get and validate port no., buffer and buffer size
   //
-
+argint(0 , &port);
+   argstr(1 , &buf);
+   argint(2 , &n);
   return send(port, buf, n);
 }
 
@@ -56,6 +59,9 @@ sys_recv(void)
   //
   // TODO: Write your code to get and validate port no., buffer and buffer size
   //
+   argint(0 , &port);
+   argstr(1 , &buf);
+   argint(2 , &n);
 
   return recv(port, buf, n);
 }
@@ -68,6 +74,7 @@ sys_disconnect(void)
   //
   // TODO: Write your code to get and validate port no.
   //
+   argint(0 , &port);
 
   return disconnect(port);
 }
