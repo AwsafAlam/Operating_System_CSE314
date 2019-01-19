@@ -15,6 +15,7 @@
 struct {
   struct spinlock lock;
   struct sock sock[NSOCK];
+  int nsockets;
 } stable;
 
 
@@ -26,10 +27,10 @@ sinit(void)
   // initialization.
   //
   initlock(&stable.lock, "stable");
-  //s = stable.sock;
+  stable.nsockets = 0;
 }
 
-// Allocate a file structure.
+// Allocate a socket structure.
 struct sock*
 sockalloc(void)
 {
@@ -53,20 +54,23 @@ listen(int lport) {
   //
   // TODO: Put the actual implementation of listen here.
   //
- 
+  if(stable.nsockets > NSOCK)
+    return E_FAIL;
+
   acquire(&stable.lock);
   cprintf("Listening at %d\n",lport);
   struct sock *s;
-  // struct sock *server;
+  
   for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
     if(s->state == CLOSED){
       s->localport = lport;
       s->state = LISTENING;
       s->remoteport = 5;
+      s->owner = myproc()->pid;
       break;
     }
   }
-  
+  stable.nsockets++;
   release(&stable.lock);
   return s->state;
 
@@ -77,8 +81,10 @@ connect(int rport, const char* host) {
   //
   // TODO: Put the actual implementation of connect here.
   //
+  if(stable.nsockets > NSOCK)
+    return E_FAIL;
+
   struct sock *s;
-  //struct sock *client;
   acquire(&stable.lock);
 
   int serverrp=-1;
@@ -96,11 +102,12 @@ connect(int rport, const char* host) {
       s->localport = serverrp;
       s->remoteport = rport;
       s->state = CONNECTED;
+      s->owner = myproc()->pid;
       break;
     }
   }
   cprintf("Client>>Connected to server at remote : %d\nClient>>localport: %d\n",rport,serverrp);
-
+  stable.nsockets++;
   release(&stable.lock);
   return serverrp;
 
@@ -113,7 +120,7 @@ send(int lport, const char* data, int n) {
   //
   struct sock *s;
   struct sock *dst;
-
+  
   acquire(&stable.lock);
   for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
     if(s->localport == lport){
@@ -125,7 +132,11 @@ send(int lport, const char* data, int n) {
       break;
     }
   }
+  if(myproc()->pid != s->owner)
+    return E_ACCESS_DENIED;
   
+  if(s->state != CONNECTED)
+    return E_WRONG_STATE;
   // cprintf("Sending data len: %d to %d\n",n, dst->localport);
   int len = strlen(dst->buf);
   
@@ -159,11 +170,10 @@ recv(int lport, char* data, int n) {
       break;
     }
   }
-  // for(dst = stable.sock; dst < &stable.sock[NSOCK]; dst++){
-  //   if(dst->localport == s->remoteport){
-  //     break;
-  //   }
-  // }
+  if(myproc()->pid != s->owner)
+    return E_ACCESS_DENIED;
+  if(s->state != CONNECTED)
+    return E_WRONG_STATE;
   
 // CHECK:
   int len = strlen(s->buf);
@@ -223,7 +233,7 @@ disconnect(int lport) {
     }
   }
   cprintf("Closing socket");
-
+  stable.nsockets--;
   release(&stable.lock);
 
   return 0;
