@@ -20,7 +20,7 @@ void clientProc() {
     printf(1, "Client>> Enter text to send to server: ");
     gets(buf, sizeof(buf));
     buf[strlen(buf) - 1] = '\0'; // Eliminating the '\n'
-    printf(1, "Client>> Sending: \"%s\"\n", buf);
+    //printf(1, "Client>> Sending: \"%s\"\n", buf);
     send(clientPort, buf, strlen(buf) + 1);
   
     if (0 == strcmp(buf, "exit")) {
@@ -31,7 +31,8 @@ void clientProc() {
 
     sleep(100 + uptime() % 100);
 
-    printf(1,"Client waiting to receive\n");
+    //printf(1,"Client waiting to receive\n");
+    memset(&buf[0], 0, sizeof(buf));
     recv(clientPort, buf, sizeof(buf));
     printf(1, "Client>> Received: \"%s\"\n", buf);
   }
@@ -47,7 +48,8 @@ void serverProc() {
 
   while (1) {
     sleep(100 + uptime() % 100);
-
+    
+    memset(&buf[0], 0, sizeof(buf));
     recv(serverPort, buf, sizeof(buf));
     printf(1, "Server>> Received: \"%s\"\n", buf);
 
@@ -61,7 +63,7 @@ void serverProc() {
 
     strcpy(buf+strlen(buf), " OK");
     send(serverPort, buf, strlen(buf) + 1);
-    buf[0]='\0';
+    
   }
 }
 

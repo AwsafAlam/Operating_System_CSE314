@@ -14,3 +14,9 @@
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
 #define FSSIZE       1000  // size of file system in blocks
 
+// Error codes
+#define E_NOTFOUND -1025
+#define E_ACCESS_DENIED -1026
+#define E_WRONG_STATE -1027
+#define E_FAIL -1028
+#define E_INVALID_ARG -1029

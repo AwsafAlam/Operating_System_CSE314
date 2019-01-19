@@ -164,7 +164,7 @@ recv(int lport, char* data, int n) {
   //     break;
   //   }
   // }
-
+  
 // CHECK:
   int len = strlen(s->buf);
   if(len == 0 ){//No data in buffer. wait for rec
@@ -173,8 +173,12 @@ recv(int lport, char* data, int n) {
     sleep(s,&stable.lock);
     // cprintf("Wakeup from sleep\n");
     // goto CHECK;
-    len = strlen(s->buf);
     
+    // cprintf("Data: \"%s\"\n",data);
+    // cprintf("Kernel Buffer: \"%s\"\n",s->buf);
+
+    len = strlen(s->buf);
+    data[0] = '\0';
     strncpy(data, s->buf , len);
     // cprintf("Data received, len : %d\n",len);
     // strncpy(s->buf, "" , 0);
@@ -186,6 +190,8 @@ recv(int lport, char* data, int n) {
     
   }
   else{
+    // cprintf("Data: \"%s\"\n",data);
+    // cprintf("%d-Kernel Buffer: \"%s\"\n",len,s->buf);
     strncpy(data, s->buf , len);
     // strncpy(s->buf, "" , 0);
     for(int i = 0; i < n; i++)
