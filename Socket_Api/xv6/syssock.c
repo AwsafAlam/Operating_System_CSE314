@@ -15,6 +15,9 @@ sys_listen(void)
   // TODO: Write your code to get and validate port no.
   //
   argint(0 , &port);
+  if(port < 0 || port > NPORT)
+    return E_INVALID_ARG;
+  
   return listen(port);
 }
 
@@ -30,7 +33,16 @@ sys_connect(void)
   //
   argint(0 , &port);
   argstr(1,&host);
-  return connect(port, host);
+  if(port < 0 || port > NPORT)
+    return E_INVALID_ARG;
+
+  if(strncmp("localhost",host,strlen(host)) || strncmp("127.0.0.1",host,strlen(host)))
+  {
+    return connect(port, host);
+  }
+  else{
+    return E_INVALID_ARG;
+  } 
 
 }
 
@@ -47,6 +59,13 @@ sys_send(void)
   argint(0 , &port);
   argstr(1 , &buf);
   argint(2 , &n);
+
+  if(port < 0 || port > NPORT)
+    return E_INVALID_ARG;
+
+  if(strlen(buf) != n)
+    return E_INVALID_ARG;
+
   return send(port, buf, n);
 }
 
@@ -63,6 +82,11 @@ sys_recv(void)
    argint(0 , &port);
    argstr(1 , &buf);
    argint(2 , &n);
+  if(port < 0 || port > NPORT)
+    return E_INVALID_ARG;
+
+  if(sizeof(buf) != n)
+    return E_INVALID_ARG;
 
   return recv(port, buf, n);
 }
@@ -75,7 +99,9 @@ sys_disconnect(void)
   //
   // TODO: Write your code to get and validate port no.
   //
-   argint(0 , &port);
+  argint(0 , &port);
+  if(port < 0 || port > NPORT)
+    return E_INVALID_ARG;
 
   return disconnect(port);
 }
