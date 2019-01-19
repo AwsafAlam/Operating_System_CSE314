@@ -20,9 +20,9 @@ void clientProc() {
     printf(1, "Client>> Enter text to send to server: ");
     gets(buf, sizeof(buf));
     buf[strlen(buf) - 1] = '\0'; // Eliminating the '\n'
+    printf(1, "Client>> Sending: \"%s\"\n", buf);
     send(clientPort, buf, strlen(buf) + 1);
-    //buf[0] = '\0';
-
+  
     if (0 == strcmp(buf, "exit")) {
       printf(1, "Client exiting...\n");
       disconnect(clientPort);
@@ -31,6 +31,7 @@ void clientProc() {
 
     sleep(100 + uptime() % 100);
 
+    printf(1,"Client waiting to receive\n");
     recv(clientPort, buf, sizeof(buf));
     printf(1, "Client>> Received: \"%s\"\n", buf);
   }
@@ -60,13 +61,7 @@ void serverProc() {
 
     strcpy(buf+strlen(buf), " OK");
     send(serverPort, buf, strlen(buf) + 1);
-    
-    // printf(1, "Server>> Enter text to send to client: ");
-    // gets(buf, sizeof(buf));
-    // buf[strlen(buf) - 1] = '\0'; // Eliminating the '\n'
-    // send(serverPort, buf, strlen(buf) + 1);
-    //Clear buffer after send
-    //buf[0] = '\0';
+    buf[0]='\0';
   }
 }
 

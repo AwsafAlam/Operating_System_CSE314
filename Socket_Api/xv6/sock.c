@@ -62,7 +62,7 @@ listen(int lport) {
     if(s->state == CLOSED){
       s->localport = lport;
       s->state = LISTENING;
-      s->remoteport = 1;
+      s->remoteport = 5;
       break;
     }
   }
@@ -86,6 +86,7 @@ connect(int rport, const char* host) {
   for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
     if(s->localport == rport && s->state == LISTENING){
       serverrp = s->remoteport;
+      s->state = CONNECTED;
       break;
     }
   }
@@ -98,10 +99,10 @@ connect(int rport, const char* host) {
       break;
     }
   }
-  cprintf("Connected to server at remote : %d\n",rport);
+  cprintf("Client>>Connected to server at remote : %d\nClient>>localport: %d\n",rport,serverrp);
 
   release(&stable.lock);
-  return s->state;
+  return serverrp;
 
 }
 
@@ -110,18 +111,34 @@ send(int lport, const char* data, int n) {
   //
   // TODO: Put the actual implementation of send here.
   //
-  // struct sock *s;
-  // while(s->dataPresent); // blocking call outside mutex
-  // acquire(&stable.lock);
-  // cprintf("Sending data.--> %d; port->%d\n",n,lport);
-  // for(int i = 0; i < n; i++ )
-  // {
-  //   //cprintf("Send - |%d|\n",data[i]);
-  //   s->buf[i] = data[i];
-  //   i++;
-  // }
-  // s->dataPresent = 1;
-  // release(&stable.lock);
+  struct sock *s;
+  struct sock *dst;
+
+  acquire(&stable.lock);
+  for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
+    if(s->localport == lport){
+      break;
+    }
+  }
+  for(dst = stable.sock; dst < &stable.sock[NSOCK]; dst++){
+    if(dst->localport == s->remoteport){
+      break;
+    }
+  }
+  
+  // cprintf("Sending data len: %d to %d\n",n, dst->localport);
+  int len = strlen(dst->buf);
+  
+  if(len == 0){
+    strncpy(dst->buf , data , n);
+    wakeup(dst);
+  }
+  else{
+    cprintf("Buffer already has data: %d\n",len);
+  }
+  
+  // cprintf("data send done\n");
+  release(&stable.lock);
 
   return 0;
 }
@@ -132,28 +149,54 @@ recv(int lport, char* data, int n) {
   //
   // TODO: Put the actual implementation of recv here.
   //
-  //cprintf("\ninside rec\n");
-  // struct sock *s;
-  // while(!s->dataPresent); // blocking call outside mutex
-  // acquire(&stable.lock);
-  // cprintf("\nRecv data len--> %d , port-> %d\n",n,lport);
-  // // for(int i = 0; i < n; i++ )
-  // // {
-  // //   cprintf("Rec - %s\n",data[i]);
-  // //   data[i] = 'a';
+  struct sock *s;
+  // struct sock *dst;
 
-  // // }
-  // int i = 0;
-  // while(s->buf[i] != '\0'){
-  //   //cprintf("Rec - %s\n",s->buf[i]);
-  //   // data[i] = 'a';
-  //   data[i] = s->buf[i];
-  //   //strncpy(data , s->buf);
-  //   i++;
+  acquire(&stable.lock);
+  // cprintf("\nRecving at port-> %d\n",lport);
+  for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
+    if(s->localport == lport){
+      break;
+    }
+  }
+  // for(dst = stable.sock; dst < &stable.sock[NSOCK]; dst++){
+  //   if(dst->localport == s->remoteport){
+  //     break;
+  //   }
   // }
-  // s->buf[0]='\0';
-  // s->dataPresent = 0;
-  // release(&stable.lock);
+
+// CHECK:
+  int len = strlen(s->buf);
+  if(len == 0 ){//No data in buffer. wait for rec
+
+    // cprintf("No data in buffer. waiting... %d\n",s->localport);
+    sleep(s,&stable.lock);
+    // cprintf("Wakeup from sleep\n");
+    // goto CHECK;
+    len = strlen(s->buf);
+    
+    strncpy(data, s->buf , len);
+    // cprintf("Data received, len : %d\n",len);
+    // strncpy(s->buf, "" , 0);
+    
+    for(int i = 0; i < n; i++)
+    {
+      s->buf[i] = '\0';
+    }
+    
+  }
+  else{
+    strncpy(data, s->buf , len);
+    // strncpy(s->buf, "" , 0);
+    for(int i = 0; i < n; i++)
+    {
+      s->buf[i] = '\0';
+    }
+
+    // cprintf("Data received, len : %d\n",len);
+  }
+
+  release(&stable.lock);
   return 0;
 }
 
@@ -162,6 +205,20 @@ disconnect(int lport) {
   //
   // TODO: Put the actual implementation of disconnect here.
   //
-    // socket state close
+  // socket state close
+  struct sock *s;
+  acquire(&stable.lock);
+  for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
+    if(s->localport == lport && s->state == CONNECTED){
+      s->state = CLOSED;
+      s->localport = -1;
+      s->remoteport = -1;
+      break;
+    }
+  }
+  cprintf("Closing socket");
+
+  release(&stable.lock);
+
   return 0;
 }
