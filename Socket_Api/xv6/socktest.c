@@ -13,6 +13,9 @@ void clientProc() {
 
   printf(1, "Client>> Attempting to connect to port %d, host %s ...\n", serverPort, host);
   clientPort = connect(serverPort, host);
+  if(clientPort < 0)
+    printf(1, "Client>> Could Not connect\n");
+
   //sleep(20); // For context switching
   printf(1, "Client>> connect() returned %d\n", clientPort);
 
@@ -44,6 +47,9 @@ void serverProc() {
 
   printf(1, "Server>> Starting to listen at port %d ...\n", serverPort);
   status = listen(serverPort);
+  if(status < 0)
+    printf(1, "Server>> Could Not connect\n");
+
   printf(1, "Server>> listen() returned %d\n", status);
 
   while (1) {
