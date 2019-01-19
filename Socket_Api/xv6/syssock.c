@@ -14,7 +14,9 @@ sys_listen(void)
   //
   // TODO: Write your code to get and validate port no.
   //
-  argint(0 , &port);
+  if(argint(0 , &port) < 0)
+    return -1;
+
   if(port < 0 || port > NPORT)
     return E_INVALID_ARG;
   
@@ -31,12 +33,16 @@ sys_connect(void)
   // TODO: Write your code to get and validate port no., host.
   // Allow connection to "localhost" or "127.0.0.1" host only
   //
-  argint(0 , &port);
-  argstr(1,&host);
+  if(argint(0 , &port) < 0)
+    return -1;
+  
+  if(argstr(1,&host) < 0)
+    return -1;
+    
   if(port < 0 || port > NPORT)
     return E_INVALID_ARG;
 
-  if(strncmp("localhost",host,strlen(host)) || strncmp("127.0.0.1",host,strlen(host)))
+  if(strncmp("localhost",host,strlen(host))==0 || strncmp("127.0.0.1",host,strlen(host))==0)
   {
     return connect(port, host);
   }
@@ -56,15 +62,22 @@ sys_send(void)
   //
   // TODO: Write your code to get and validate port no., buffer and buffer size
   //
-  argint(0 , &port);
-  argstr(1 , &buf);
-  argint(2 , &n);
+  if(argint(0 , &port) < 0)
+    return -1;
+  
+  if(argstr(1,&buf) < 0)
+    return -1;
+  
+  if(argint(2,&n) < 0)
+    return -1;
 
   if(port < 0 || port > NPORT)
     return E_INVALID_ARG;
 
-  if(strlen(buf) != n)
-    return E_INVALID_ARG;
+  // if(sizeof(buf) +1 > n){
+  //   cprintf("\nSend func:Size mismatch n: %d - buf: %d \n",n,sizeof(buf) +1 );
+  //   return E_INVALID_ARG;
+  // }
 
   return send(port, buf, n);
 }
@@ -79,14 +92,22 @@ sys_recv(void)
   //
   // TODO: Write your code to get and validate port no., buffer and buffer size
   //
-   argint(0 , &port);
-   argstr(1 , &buf);
-   argint(2 , &n);
+  if(argint(0 , &port) < 0)
+    return -1;
+  
+  if(argstr(1,&buf) < 0)
+    return -1;
+  
+  if(argint(2,&n) < 0)
+    return -1;
+
   if(port < 0 || port > NPORT)
     return E_INVALID_ARG;
 
-  if(sizeof(buf) != n)
-    return E_INVALID_ARG;
+  // if(sizeof(buf) +1 < n){
+  //   cprintf("\nRecv func:Size mismatch n: %d - buf: %d \n",n,sizeof(buf) +1 );
+  //   return E_INVALID_ARG;
+  // }
 
   return recv(port, buf, n);
 }
@@ -99,7 +120,9 @@ sys_disconnect(void)
   //
   // TODO: Write your code to get and validate port no.
   //
-  argint(0 , &port);
+  if(argint(0 , &port) < 0)
+    return -1;
+  
   if(port < 0 || port > NPORT)
     return E_INVALID_ARG;
 

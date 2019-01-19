@@ -8,10 +8,7 @@
 #include "x86.h"
 #include "proc.h"
 
-//
-// TODO: Create a structure to maintain a list of sockets
-// Should it have locking?
-//
+
 struct {
   struct spinlock lock;
   struct sock sock[NSOCK];
@@ -22,38 +19,14 @@ struct {
 void
 sinit(void)
 {
-  //
-  // TODO: Write any initialization code for socket API
-  // initialization.
-  //
   initlock(&stable.lock, "stable");
   stable.nsockets = 0;
 }
 
-// Allocate a socket structure.
-struct sock*
-sockalloc(void)
-{
-  struct sock *f;
-
-  acquire(&stable.lock);
-  for(f = stable.sock; f < stable.sock+ NSOCK; f++){
-//    if(f->ref == 0){
-//      f->ref = 1;
-//      release(&ftable.lock);
-//      return f;
-//    }
-  }
-  release(&stable.lock);
-  return 0;
-}
 
 int
 listen(int lport) {
 
-  //
-  // TODO: Put the actual implementation of listen here.
-  //
   if(stable.nsockets > NSOCK)
     return E_FAIL;
 
@@ -72,15 +45,13 @@ listen(int lport) {
   }
   stable.nsockets++;
   release(&stable.lock);
-  return s->state;
+  return 0;
 
 }
 
 int
 connect(int rport, const char* host) {
-  //
-  // TODO: Put the actual implementation of connect here.
-  //
+  
   if(stable.nsockets > NSOCK)
     return E_FAIL;
 
@@ -96,7 +67,9 @@ connect(int rport, const char* host) {
       break;
     }
   }
-  
+  if(serverrp == -1)
+    return E_NOTFOUND;
+
   for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
     if(serverrp != -1 && s->state == CLOSED){
       s->localport = serverrp;
@@ -115,28 +88,37 @@ connect(int rport, const char* host) {
 
 int
 send(int lport, const char* data, int n) {
-  //
-  // TODO: Put the actual implementation of send here.
-  //
+  
   struct sock *s;
   struct sock *dst;
   
   acquire(&stable.lock);
+  int flag = -1;
   for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
     if(s->localport == lport){
+      flag = 0;
       break;
     }
   }
+  if(flag == -1)
+    return E_NOTFOUND;
+
+  flag = -1;// Not found flag
   for(dst = stable.sock; dst < &stable.sock[NSOCK]; dst++){
     if(dst->localport == s->remoteport){
+      flag = 0;
       break;
     }
   }
+  if(flag == -1)
+    return E_NOTFOUND;
+
   if(myproc()->pid != s->owner)
     return E_ACCESS_DENIED;
   
   if(s->state != CONNECTED)
     return E_WRONG_STATE;
+  
   // cprintf("Sending data len: %d to %d\n",n, dst->localport);
   int len = strlen(dst->buf);
   
@@ -146,6 +128,8 @@ send(int lport, const char* data, int n) {
   }
   else{
     cprintf("Buffer already has data: %d\n",len);
+    sleep(s,&stable.lock);
+    strncpy(dst->buf , data , n);
   }
   
   // cprintf("data send done\n");
@@ -157,19 +141,32 @@ send(int lport, const char* data, int n) {
 
 int
 recv(int lport, char* data, int n) {
-  //
-  // TODO: Put the actual implementation of recv here.
-  //
+ 
   struct sock *s;
-  // struct sock *dst;
+  struct sock *dst;
 
   acquire(&stable.lock);
   // cprintf("\nRecving at port-> %d\n",lport);
+  int flag = -1;
   for(s = stable.sock; s < &stable.sock[NSOCK]; s++){
     if(s->localport == lport){
+      flag = 0;
       break;
     }
   }
+  if(flag == -1)
+    return E_NOTFOUND;
+
+  flag = -1;
+  for(dst = stable.sock; dst < &stable.sock[NSOCK]; dst++){
+    if(dst->localport == s->remoteport){
+      flag = 0;
+      break;
+    }
+  }
+  if(flag == -1)
+    return E_NOTFOUND;
+
   if(myproc()->pid != s->owner)
     return E_ACCESS_DENIED;
   if(s->state != CONNECTED)
@@ -181,17 +178,12 @@ recv(int lport, char* data, int n) {
 
     // cprintf("No data in buffer. waiting... %d\n",s->localport);
     sleep(s,&stable.lock);
-    // cprintf("Wakeup from sleep\n");
+    
     // goto CHECK;
     
-    // cprintf("Data: \"%s\"\n",data);
-    // cprintf("Kernel Buffer: \"%s\"\n",s->buf);
-
     len = strlen(s->buf);
     data[0] = '\0';
     strncpy(data, s->buf , len);
-    // cprintf("Data received, len : %d\n",len);
-    // strncpy(s->buf, "" , 0);
     
     for(int i = 0; i < n; i++)
     {
@@ -200,16 +192,14 @@ recv(int lport, char* data, int n) {
     
   }
   else{
-    // cprintf("Data: \"%s\"\n",data);
-    // cprintf("%d-Kernel Buffer: \"%s\"\n",len,s->buf);
+    
     strncpy(data, s->buf , len);
-    // strncpy(s->buf, "" , 0);
     for(int i = 0; i < n; i++)
     {
       s->buf[i] = '\0';
     }
+    wakeup(dst);
 
-    // cprintf("Data received, len : %d\n",len);
   }
 
   release(&stable.lock);
@@ -229,10 +219,11 @@ disconnect(int lport) {
       s->state = CLOSED;
       s->localport = -1;
       s->remoteport = -1;
+      memset(&s->buf[0], 0, sizeof(s->buf));
       break;
     }
   }
-  cprintf("Closing socket");
+  cprintf("Closing socket at port %d..\n",lport);
   stable.nsockets--;
   release(&stable.lock);
 

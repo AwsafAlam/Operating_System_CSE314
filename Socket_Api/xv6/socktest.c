@@ -1,7 +1,23 @@
 #include "types.h"
 #include "user.h"
+#include "param.h"
 
 int serverPort = 10;
+
+void printError(int status){
+  if(status == E_NOTFOUND)
+      printf(1, "Client>>Error E_NOTFOUND: %d\n",status);
+    else if(status == E_ACCESS_DENIED)
+        printf(1, "Client>>Error E_ACCESS_DENIED: %d\n",status);
+    else if(status == E_WRONG_STATE)
+        printf(1, "Client>>Error E_WRONG_STATE: %d\n",status);
+    else if(status == E_FAIL)
+        printf(1, "Client>> Error E_FAIL: %d\n",status);
+    else if(status == E_INVALID_ARG)
+          printf(1, "Client>> Error E_INVALID_ARG: %d\n",status);
+    else
+      printf(1, "Client>>Unknown Error : %d\n",status);
+}
 
 void clientProc() {
   int clientPort;
@@ -13,19 +29,24 @@ void clientProc() {
 
   printf(1, "Client>> Attempting to connect to port %d, host %s ...\n", serverPort, host);
   clientPort = connect(serverPort, host);
-  if(clientPort < 0)
-    printf(1, "Client>> Could Not connect\n");
-
-  //sleep(20); // For context switching
-  printf(1, "Client>> connect() returned %d\n", clientPort);
+  if(clientPort < 0){
+    printError(clientPort);
+    printf(1, "Exiting client..\n");
+    return;
+  }
+  else
+    printf(1, "Client>> connect() returned %d\n", clientPort);
 
   while (1) {
     printf(1, "Client>> Enter text to send to server: ");
     gets(buf, sizeof(buf));
     buf[strlen(buf) - 1] = '\0'; // Eliminating the '\n'
-    //printf(1, "Client>> Sending: \"%s\"\n", buf);
-    send(clientPort, buf, strlen(buf) + 1);
+    int sendStat = send(clientPort, buf, strlen(buf) + 1);
+    if(sendStat < 0)
+      printError(sendStat);
+
   
+
     if (0 == strcmp(buf, "exit")) {
       printf(1, "Client exiting...\n");
       disconnect(clientPort);
@@ -34,10 +55,12 @@ void clientProc() {
 
     sleep(100 + uptime() % 100);
 
-    //printf(1,"Client waiting to receive\n");
     memset(&buf[0], 0, sizeof(buf));
-    recv(clientPort, buf, sizeof(buf));
-    printf(1, "Client>> Received: \"%s\"\n", buf);
+    int recStatus = recv(clientPort, buf, sizeof(buf));
+    if(recStatus < 0)
+      printError(recStatus);
+    else
+      printf(1, "Client>> Received: \"%s\" STATUS: %d\n", buf,recStatus);
   }
 }
 
@@ -45,19 +68,23 @@ void serverProc() {
   int status;
   char buf[128];
 
+  // sleep(100); // Make sure client starts before server
   printf(1, "Server>> Starting to listen at port %d ...\n", serverPort);
   status = listen(serverPort);
   if(status < 0)
-    printf(1, "Server>> Could Not connect\n");
-
-  printf(1, "Server>> listen() returned %d\n", status);
+    printError(status);
+  else
+    printf(1, "Server>> listen() returned STATUS %d\n", status);
 
   while (1) {
     sleep(100 + uptime() % 100);
     
     memset(&buf[0], 0, sizeof(buf));
-    recv(serverPort, buf, sizeof(buf));
-    printf(1, "Server>> Received: \"%s\"\n", buf);
+    int recvStatus = recv(serverPort, buf, sizeof(buf));
+    if(recvStatus < 0)
+      printError(recvStatus);
+    else
+      printf(1, "Server>> Received: \"%s\" STATUS: %d\n", buf, recvStatus);
 
     if (0 == strcmp(buf, "exit")) {
       printf(1, "Server exiting...\n");
@@ -68,7 +95,9 @@ void serverProc() {
     sleep(100 + uptime() % 100);
 
     strcpy(buf+strlen(buf), " OK");
-    send(serverPort, buf, strlen(buf) + 1);
+    int sendStatus = send(serverPort, buf, strlen(buf) + 1);
+    if(sendStatus < 0)
+      printError(sendStatus);
     
   }
 }
