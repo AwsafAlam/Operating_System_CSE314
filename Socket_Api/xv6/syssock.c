@@ -14,7 +14,7 @@ sys_listen(void)
   //
   // TODO: Write your code to get and validate port no.
   //
-
+  argint(0 , &port);
   return listen(port);
 }
 
@@ -28,9 +28,10 @@ sys_connect(void)
   // TODO: Write your code to get and validate port no., host.
   // Allow connection to "localhost" or "127.0.0.1" host only
   //
-   argint(0 , &port);
-   argstr(1,&host);
+  argint(0 , &port);
+  argstr(1,&host);
   return connect(port, host);
+
 }
 
 int
@@ -43,9 +44,9 @@ sys_send(void)
   //
   // TODO: Write your code to get and validate port no., buffer and buffer size
   //
-argint(0 , &port);
-   argstr(1 , &buf);
-   argint(2 , &n);
+  argint(0 , &port);
+  argstr(1 , &buf);
+  argint(2 , &n);
   return send(port, buf, n);
 }
 
