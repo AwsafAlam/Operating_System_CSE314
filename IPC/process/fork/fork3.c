@@ -21,13 +21,14 @@ int main()
 		break;
 		default:
 			message = "This is the parent";
-			n = 10;
+			n = 15;
 		break;	
 	}
 
 	for(; n > 0; n--) {
 		puts(message);
-		//sleep(1);
+		sleep(1);
 	}
+	
 	exit(0);
 }

@@ -9,7 +9,7 @@
 3. From xv6 shell, run the user program
 
 # syscall.h
- #define awsaf_alam 32
+ #define awsaf_alam 23
 
 # defs.h
 
@@ -28,7 +28,7 @@ sys_awsaf_alam(void)
   return awsaf_alam();
 }
 
-# usys.c
+# usys.s
 
 SYSCALL(awsaf_alam())
 
